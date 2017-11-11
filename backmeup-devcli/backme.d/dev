@@ -6,13 +6,18 @@ use "dev"
 SUBCOMMAND_DESC="\t\tDev commands"
 SUBCOMMAND_HELP=$(cat <<EOH
 s|static-analysis   Run flake8
-t|tests             Run all tests
+ut|unit-tests       Run unit tests.
+t|tests             Run all tests. (Unit and static analysis)
 EOH
 )
 
 case ${1} in
   t|tests)
     tests
+  ;;
+
+  ut|unit-tests)
+    unit_tests
   ;;
 
   s|static-analysis)

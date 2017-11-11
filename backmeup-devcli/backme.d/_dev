@@ -4,12 +4,18 @@ use "go_to"
 set -e
 
 function tests {
-  in_yellow "Running all tests\n"
   go_to_root
-  pytest tests
-  in_green "All tests passed\n"
+  unit_tests
+  static_analysis
 }
 
+function unit_tests {
+  in_yellow "Running unit tests\n"
+  go_to_root
+  pytest tests
+
+  in_green "All unit tests passed\n"
+}
 
 function static_analysis {
   in_yellow "Running static analysis\n"
