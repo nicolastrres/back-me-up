@@ -3,7 +3,7 @@ import tempfile
 import os
 from hamcrest import assert_that, equal_to
 
-import back_me_up
+from back_me_up import back_me_up
 
 
 def test_should_return_empty_list_when_no_files():
