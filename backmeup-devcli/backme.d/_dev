@@ -1,14 +1,19 @@
 #!/usr/bin/env bash
 
 use "go_to"
+set -e
 
 function tests {
-    go_to_root
-    pytest tests
+  in_yellow "Running all tests\n"
+  go_to_root
+  pytest tests
+  in_green "All tests passed\n"
 }
 
 
 function static_analysis {
-    go_to_root
-    flake8 .
+  in_yellow "Running static analysis\n"
+  go_to_root
+  flake8 .
+  in_green "Static analysis passed\n"
 }
