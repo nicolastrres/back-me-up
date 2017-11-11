@@ -6,3 +6,9 @@ function tests {
     go_to_root
     pytest tests
 }
+
+
+function static_analysis {
+    go_to_root
+    flake8 .
+}
