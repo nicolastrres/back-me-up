@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# vim: ft=sh:
+
+function go_to_root() {
+  cd ${ROOT_DIR}/../
+}

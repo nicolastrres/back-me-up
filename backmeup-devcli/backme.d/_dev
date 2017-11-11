@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+use "go_to"
+
+function tests {
+    go_to_root
+    pytest tests
+}
