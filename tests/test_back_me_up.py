@@ -36,7 +36,7 @@ def test_should_return_last_modified_date(getmtime_mocked):
     assert_that(expected_last_modification_date, equal_to(last_modified_date))
 
 
-def test_should_raise_inaccessible_file_when_file_does_not_exist():
+def test_should_raise_inaccessible_file_exception_when_file_does_not_exist():
     with pytest.raises(InaccessibleFileException) as excinfo:
         back_me_up.get_last_modification_date('non-existent-file.txt')
 
