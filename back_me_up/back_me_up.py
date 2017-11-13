@@ -54,8 +54,3 @@ class BackupFile:
             return os.path.getmtime(self.path)
         except FileNotFoundError as e:
             raise InaccessibleFileException(self.path, e)
-
-
-class StatusFileParser:
-    def __init__(self, status_file):
-        self.status_file = status_file
