@@ -46,3 +46,12 @@ def test_should_raise_inaccessible_file_exception_when_file_does_not_exist():
         "such file or directory: 'non-existent-file.txt'",
         equal_to(str(excinfo.value))
     )
+
+
+def test_should_store_file_data():
+    with tempfile.NamedTemporaryFile() as file:
+        back_me_up.store_file_last_modification_data(file.name, 'my_file.txt', 1510431915.0)
+
+        actual_line = file.read()
+
+    assert_that(b'my_file.txt 1510431915.0', equal_to(actual_line))
