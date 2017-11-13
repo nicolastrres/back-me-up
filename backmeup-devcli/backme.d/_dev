@@ -12,14 +12,19 @@ function tests {
 function unit_tests {
   in_yellow "Running unit tests\n"
   go_to_root
-  pytest tests
-
+  remove_python_files
+  run_container_with_volume pytest tests
   in_green "All unit tests passed\n"
 }
 
 function static_analysis {
   in_yellow "Running static analysis\n"
   go_to_root
-  flake8 .
+  run_container_with_volume flake8 .
   in_green "Static analysis passed\n"
+}
+
+function remove_python_files() {
+  find . -path ./virtual_env -prune -o -name '*.pyc' -print | xargs rm -rf
+  find . -path ./virtual_env -prune -o -name '__pycache__' -print | xargs rm -rf
 }

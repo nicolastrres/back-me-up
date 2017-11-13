@@ -2,9 +2,12 @@
 # vim: ft=sh:
 
 use "dev"
+use "docker"
+
 
 SUBCOMMAND_DESC="\t\tDev commands"
 SUBCOMMAND_HELP=$(cat <<EOH
+b|build-image       Build docker image
 s|static-analysis   Run flake8
 ut|unit-tests       Run unit tests.
 t|tests             Run all tests. (Unit and static analysis)
@@ -12,6 +15,10 @@ EOH
 )
 
 case ${1} in
+  b|build-image)
+    build_image
+  ;;
+
   t|tests)
     tests
   ;;

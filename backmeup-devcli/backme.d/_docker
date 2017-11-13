@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+
+function build_image {
+    docker build . -t nicolastrres/backmeup
+}
+
+function run_container_with_volume {
+    docker run --rm -v $(pwd):/back-me-up nicolastrres/backmeup ${1}
+}
