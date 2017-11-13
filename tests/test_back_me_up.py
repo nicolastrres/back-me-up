@@ -11,7 +11,8 @@ from back_me_up.exceptions import InaccessibleFileException
 
 def test_should_return_empty_list_when_no_files():
     with tempfile.TemporaryDirectory() as directory:
-        actual_files = back_me_up.list_files(directory)
+        backup_folder = back_me_up.BackupFolder(directory)
+        actual_files = backup_folder.files
 
     assert_that([], equal_to(actual_files))
 
@@ -19,10 +20,11 @@ def test_should_return_empty_list_when_no_files():
 def test_should_return_all_files():
     with tempfile.TemporaryDirectory() as directory:
         with tempfile.NamedTemporaryFile(dir=directory) as file:
-            expected_file_name = os.path.basename(file.name)
-            actual_files = back_me_up.list_files(directory)
+            expected_file_path = os.path.basename(file.name)
+            backup_folder = back_me_up.BackupFolder(directory)
+            actual_file_paths = [file.path for file in backup_folder.files]
 
-    assert_that([expected_file_name], equal_to(actual_files))
+    assert_that([expected_file_path], equal_to(actual_file_paths))
 
 
 @mock.patch('os.path.getmtime')
@@ -31,14 +33,17 @@ def test_should_return_last_modified_date(getmtime_mocked):
     getmtime_mocked.return_value = expected_last_modification_date
 
     with tempfile.NamedTemporaryFile() as file:
-        last_modified_date = back_me_up.get_last_modification_date(file.name)
+        backup_file = back_me_up.BackupFile(file.name)
+        last_modified_date = backup_file.last_modification_date
 
     assert_that(expected_last_modification_date, equal_to(last_modified_date))
 
 
 def test_should_raise_inaccessible_file_exception_when_file_does_not_exist():
     with pytest.raises(InaccessibleFileException) as excinfo:
-        back_me_up.get_last_modification_date('non-existent-file.txt')
+        __ = back_me_up.BackupFile(  # NOQA
+            'non-existent-file.txt'
+        ).last_modification_date
 
     assert_that(
         "File non-existent-file.txt does not exist or "
@@ -50,8 +55,9 @@ def test_should_raise_inaccessible_file_exception_when_file_does_not_exist():
 
 def test_should_store_file_data():
     with tempfile.NamedTemporaryFile() as file:
-        back_me_up.store_file_last_modification_data(
-            file.name, 'my_file.txt', 1510431915.0
+        status_file = back_me_up.StatusFile(file.name)
+        status_file.store_file_last_modification_data(
+            'my_file.txt', 1510431915.0
         )
 
         actual_line = file.read()
@@ -61,12 +67,12 @@ def test_should_store_file_data():
 
 def test_read_last_modification_date():
     with tempfile.NamedTemporaryFile(delete=False) as file:
-        back_me_up.store_file_last_modification_data(
-            file.name, 'my_file.txt', 1510431915.0
+        status_file = back_me_up.StatusFile(file.name)
+        status_file.store_file_last_modification_data(
+            'my_file.txt', 1510431915.0
         )
 
-        last_modification_date = back_me_up.read_last_modifcation_date(
-            status_file_path=file.name,
+        last_modification_date = status_file.get_last_modification_date(
             file_to_backup='my_file.txt'
         )
 

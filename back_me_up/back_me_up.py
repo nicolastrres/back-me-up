@@ -3,43 +3,59 @@ import os
 from back_me_up.exceptions import InaccessibleFileException
 
 
-def list_files(folder):
-    return os.listdir(folder)
+class StatusFile:
+    def __init__(self, path):
+        self.path = path
+
+    def store_file_last_modification_data(
+            self,
+            backup_file_name,
+            last_modification_date
+    ):
+        with open(self.path, 'w') as status_file:
+            status_file.write(
+                '%s,%s' % (backup_file_name, last_modification_date)
+            )
+
+    @property
+    def lines(self):
+        with open(self.path, 'r') as file:
+            lines = file.readlines()
+        return lines
+
+    def get_last_modification_date(self, file_to_backup):
+        return self._parse_lines()[file_to_backup]
+
+    def _parse_lines(self):
+        parsed_lines = {}
+        for line in self.lines:
+            file_name, last_modification_date = line.split(',')
+            parsed_lines[file_name] = last_modification_date
+
+        return parsed_lines
 
 
-def get_last_modification_date(file_path):
-    try:
-        return os.path.getmtime(file_path)
-    except FileNotFoundError as e:
-        raise InaccessibleFileException(file_path, e)
+class BackupFolder:
+    def __init__(self, path):
+        self.path = path
+
+    @property
+    def files(self):
+        return [BackupFile(file_path) for file_path in os.listdir(self.path)]
 
 
-def store_file_last_modification_data(
-        status_file_path,
-        backup_file_name,
-        last_modification_date
-):
-    with open(status_file_path, 'w') as status_file:
-        status_file.write(
-            '%s,%s' % (backup_file_name, last_modification_date)
-        )
+class BackupFile:
+    def __init__(self, path):
+        self.path = path
+
+    @property
+    def last_modification_date(self):
+        try:
+            return os.path.getmtime(self.path)
+        except FileNotFoundError as e:
+            raise InaccessibleFileException(self.path, e)
 
 
-def read_file(file_to_read):
-    with open(file_to_read, 'r') as file:
-        lines = file.readlines()
-    return parse_lines(lines)
-
-
-def parse_lines(lines):
-    parsed_lines = {}
-    for line in lines:
-        file_name, last_modification_date = line.split(',')
-        parsed_lines[file_name] = last_modification_date
-
-    return parsed_lines
-
-
-def read_last_modifcation_date(status_file_path, file_to_backup):
-    lines = read_file(status_file_path)
-    return lines[file_to_backup]
+class StatusFileParser:
+    def __init__(self, status_file):
+        self.status_file = status_file
