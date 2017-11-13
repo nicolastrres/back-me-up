@@ -50,8 +50,24 @@ def test_should_raise_inaccessible_file_exception_when_file_does_not_exist():
 
 def test_should_store_file_data():
     with tempfile.NamedTemporaryFile() as file:
-        back_me_up.store_file_last_modification_data(file.name, 'my_file.txt', 1510431915.0)
+        back_me_up.store_file_last_modification_data(
+            file.name, 'my_file.txt', 1510431915.0
+        )
 
         actual_line = file.read()
 
-    assert_that(b'my_file.txt 1510431915.0', equal_to(actual_line))
+    assert_that(b'my_file.txt,1510431915.0', equal_to(actual_line))
+
+
+def test_read_last_modification_date():
+    with tempfile.NamedTemporaryFile(delete=False) as file:
+        back_me_up.store_file_last_modification_data(
+            file.name, 'my_file.txt', 1510431915.0
+        )
+
+        last_modification_date = back_me_up.read_last_modifcation_date(
+            status_file_path=file.name,
+            file_to_backup='my_file.txt'
+        )
+
+        assert_that('1510431915.0', equal_to(last_modification_date))

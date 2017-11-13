@@ -21,5 +21,25 @@ def store_file_last_modification_data(
 ):
     with open(status_file_path, 'w') as status_file:
         status_file.write(
-            '%s %s' % (backup_file_name, last_modification_date)
+            '%s,%s' % (backup_file_name, last_modification_date)
         )
+
+
+def read_file(file_to_read):
+    with open(file_to_read, 'r') as file:
+        lines = file.readlines()
+    return parse_lines(lines)
+
+
+def parse_lines(lines):
+    parsed_lines = {}
+    for line in lines:
+        file_name, last_modification_date = line.split(',')
+        parsed_lines[file_name] = last_modification_date
+
+    return parsed_lines
+
+
+def read_last_modifcation_date(status_file_path, file_to_backup):
+    lines = read_file(status_file_path)
+    return lines[file_to_backup]
