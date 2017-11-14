@@ -54,3 +54,20 @@ class BackupFile:
             return os.path.getmtime(self.path)
         except FileNotFoundError as e:
             raise InaccessibleFileException(self.path, e)
+
+
+class BackmeUp:
+    def __init__(self, status_file, file_storage_service):
+        self.file_storage_service = file_storage_service
+        self.status_file = status_file
+
+    def backup_folder(self, path):
+        for file in BackupFolder(path=path).files:
+            self._store_file_status(file.path, file.last_modification_date)
+            self.file_storage_service.backup_file(file.path)
+
+    def _store_file_status(self, file_path, file_modification_date):
+        self.status_file.store_file_last_modification_data(
+            file_path,
+            file_modification_date
+        )
