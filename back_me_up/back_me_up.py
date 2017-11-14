@@ -12,9 +12,9 @@ class StatusFile:
             backup_file_name,
             last_modification_date
     ):
-        with open(self.path, 'w') as status_file:
+        with open(self.path, 'a') as status_file:
             status_file.write(
-                '%s,%s' % (backup_file_name, last_modification_date)
+                '%s,%s\n' % (backup_file_name, last_modification_date)
             )
 
     @property

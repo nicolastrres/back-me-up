@@ -3,7 +3,7 @@ import tempfile
 from unittest import mock
 
 import pytest
-from hamcrest import assert_that, equal_to
+from hamcrest import assert_that, equal_to, has_length
 
 from back_me_up import BackupFolder, BackupFile, BackmeUp, StatusFile
 from back_me_up.exceptions import InaccessibleFileException
@@ -69,6 +69,24 @@ class TestStatusFile:
             actual_line = file.read()
 
         assert_that(b'my_file.txt,1510431915.0', equal_to(actual_line))
+
+    def test_should_store_file_status_without_overriding_other_files_statuses(
+            self
+    ):
+        with tempfile.NamedTemporaryFile() as file:
+            status_file = StatusFile(file.name)
+            status_file.store_file_last_modification_data(
+                'my_file.txt', 1510431915.0
+            )
+            status_file.store_file_last_modification_data(
+                'another_file.txt', 1231.11010
+            )
+
+            actual_lines = file.readlines()
+
+        assert_that(actual_lines, has_length(2))
+        assert_that(b'my_file.txt,1510431915.0\n', equal_to(actual_lines[0]))
+        assert_that(b'another_file.txt,1231.1101\n', equal_to(actual_lines[1]))
 
     def test_read_last_modification_date(self):
         with tempfile.NamedTemporaryFile(delete=False) as file:
