@@ -26,13 +26,31 @@ class StatusFile:
     def get_last_modification_date(self, file_to_backup):
         return self._parse_lines()[file_to_backup]
 
+    @staticmethod
+    def _remove_new_line_chars(line):
+        return line[:-1]
+
     def _parse_lines(self):
         parsed_lines = {}
         for line in self.lines:
+            line = self._remove_new_line_chars(line)
             file_name, last_modification_date = line.split(',')
             parsed_lines[file_name] = last_modification_date
 
         return parsed_lines
+
+    def update_last_modification_date(
+            self, backup_file_name, last_modification_date
+    ):
+        lines = self.lines
+        with open(self.path, 'w') as output_status_file:
+            for line in lines:
+                if line.split(',')[0] == backup_file_name:
+                    output_status_file.write(
+                        '%s,%s\n' % (backup_file_name, last_modification_date)
+                    )
+                else:
+                    output_status_file.write(line)
 
 
 class BackupFolder:

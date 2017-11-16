@@ -68,7 +68,7 @@ class TestStatusFile:
 
             actual_line = file.read()
 
-        assert_that(b'my_file.txt,1510431915.0', equal_to(actual_line))
+        assert_that(equal_to(actual_line), b'my_file.txt,1510431915.0\n')
 
     def test_should_store_file_status_without_overriding_other_files_statuses(
             self
@@ -100,6 +100,26 @@ class TestStatusFile:
             )
 
             assert_that('1510431915.0', equal_to(last_modification_date))
+
+    def test_update_modification_date_of_existing_file(self):
+        with tempfile.NamedTemporaryFile(delete=False) as file:
+            status_file = StatusFile(file.name)
+            status_file.store_file_last_modification_data(
+                'my_file.txt', 1510431915.0
+            )
+
+            print(status_file.lines)
+
+            status_file.update_last_modification_date(
+                'my_file.txt', 222222222.0
+            )
+
+            print(status_file.lines)
+
+            assert_that(
+                status_file.get_last_modification_date('my_file.txt'),
+                equal_to('222222222.0')
+            )
 
 
 class TestBackmeUp:
