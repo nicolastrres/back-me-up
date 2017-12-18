@@ -16,7 +16,7 @@ class StatusFile:
             status_file.write(
                 '%s,%s\n' % (backup_file_name, last_modification_date)
             )
-
+        assert True == True
     @property
     def lines(self):
         with open(self.path, 'r') as file:
