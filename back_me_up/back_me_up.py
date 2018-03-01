@@ -53,13 +53,15 @@ class StatusFile:
                     output_status_file.write(line)
 
 
-class BackupFolder:
-    def __init__(self, path):
+class Directory:
+    def __init__(self, path, directory_handler=os):
         self.path = path
+        self.directory_handler = directory_handler
 
     @property
-    def files(self):
-        return [BackupFile(file_path) for file_path in os.listdir(self.path)]
+    def entries(self):
+        entries = self.directory_handler.listdir(self.path)
+        return [DirectoryEntry(entry) for entry in entries]
 
 
 class BackupFile:
@@ -80,7 +82,7 @@ class BackmeUp:
         self.status_file = status_file
 
     def backup_folder(self, path):
-        for file in BackupFolder(path=path).files:
+        for file in Directory(path=path).entries:
             self._store_file_status(file.path, file.last_modification_date)
             self.file_storage_service.backup_file(file.path)
 

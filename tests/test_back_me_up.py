@@ -1,41 +1,46 @@
 import os
 import tempfile
 from unittest import mock
+from unittest.mock import Mock
 
 import pytest
 from hamcrest import assert_that, equal_to, has_length
 
-from back_me_up import BackupFolder, BackupFile, BackmeUp, StatusFile
+from back_me_up import Directory, DirectoryEntry, BackmeUp, StatusFile
 from back_me_up.exceptions import InaccessibleFileException
 
 
-class TestBackupFolder:
+class TestDirectory:
 
-    def test_should_return_empty_list_when_no_files(self):
-        with tempfile.TemporaryDirectory() as directory:
-            backup_folder = BackupFolder(directory)
-            actual_files = backup_folder.files
+    @pytest.fixture
+    def directory_handler(self):
+        return Mock(spec=os)
 
-        assert_that([], equal_to(actual_files))
+    def test_should_return_empty_list_when_no_entries(self, directory_handler):
+        directory_handler.listdir.return_value = []
 
-    def test_should_return_all_files(self):
-        with tempfile.TemporaryDirectory() as directory:
-            with tempfile.NamedTemporaryFile(dir=directory) as file:
-                expected_file_path = os.path.basename(file.name)
-                backup_folder = BackupFolder(directory)
-                actual_file_paths = [file.path for file in backup_folder.files]
+        backup_folder = Directory('/', directory_handler)
 
-        assert_that([expected_file_path], equal_to(actual_file_paths))
+        assert_that(backup_folder.entries, equal_to([]))
+
+    def test_should_return_all_entries(self, directory_handler):
+        directory_handler.listdir.return_value = ['file1', 'file2']
+
+        backup_folder = Directory('/', directory_handler)
+
+        assert_that(backup_folder.entries, has_length(2))
+        assert_that(backup_folder.entries[0].path, equal_to('file1'))
+        assert_that(backup_folder.entries[1].path, equal_to('file2'))
 
 
-class TestBackupFile:
+class TestDirectoryEntry:
     @mock.patch('os.path.getmtime')
     def test_should_return_last_modified_date(self, getmtime_mocked):
         expected_last_modification_date = 1510431915.0
         getmtime_mocked.return_value = expected_last_modification_date
 
         with tempfile.NamedTemporaryFile() as file:
-            backup_file = BackupFile(file.name)
+            backup_file = DirectoryEntry(file.name)
             last_modified_date = backup_file.last_modification_date
 
         assert_that(
@@ -46,7 +51,7 @@ class TestBackupFile:
             self
     ):
         with pytest.raises(InaccessibleFileException) as excinfo:
-            __ = BackupFile(  # NOQA
+            __ = DirectoryEntry(  # NOQA
                 'non-existent-file.txt'
             ).last_modification_date
 

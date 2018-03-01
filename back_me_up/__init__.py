@@ -1,11 +1,11 @@
 from back_me_up.back_me_up import (
-    BackupFile, BackmeUp, BackupFolder, StatusFile
+    DirectoryEntry, BackmeUp, Directory, StatusFile
 )
 
 
 __all__ = [
     'BackmeUp',
-    'BackupFolder',
-    'BackupFile',
+    'Directory',
+    'DirectoryEntry',
     'StatusFile'
 ]
