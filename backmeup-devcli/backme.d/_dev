@@ -3,6 +3,10 @@
 use "go_to"
 set -e
 
+function console {
+  run_container_with_volume ipython
+}
+
 function tests {
   go_to_root
   unit_tests
