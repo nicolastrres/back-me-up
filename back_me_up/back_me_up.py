@@ -64,14 +64,15 @@ class Directory:
         return [DirectoryEntry(entry) for entry in entries]
 
 
-class BackupFile:
-    def __init__(self, path):
+class DirectoryEntry:
+    def __init__(self, path, directory_handler=os):
         self.path = path
+        self.directory_handler = directory_handler
 
     @property
     def last_modification_date(self):
         try:
-            return os.path.getmtime(self.path)
+            return self.directory_handler.path.getmtime(self.path)
         except FileNotFoundError as e:
             raise InaccessibleFileException(self.path, e)
 

@@ -10,13 +10,16 @@ from back_me_up import Directory, DirectoryEntry, BackmeUp, StatusFile
 from back_me_up.exceptions import InaccessibleFileException
 
 
+@pytest.fixture
+def directory_handler():
+    return Mock(spec=os)
+
+
 class TestDirectory:
 
-    @pytest.fixture
-    def directory_handler(self):
-        return Mock(spec=os)
-
-    def test_should_return_empty_list_when_no_entries(self, directory_handler):
+    def test_should_return_empty_list_when_no_entries(
+            self, directory_handler
+    ):
         directory_handler.listdir.return_value = []
 
         backup_folder = Directory('/', directory_handler)
@@ -34,25 +37,27 @@ class TestDirectory:
 
 
 class TestDirectoryEntry:
-    @mock.patch('os.path.getmtime')
-    def test_should_return_last_modified_date(self, getmtime_mocked):
-        expected_last_modification_date = 1510431915.0
-        getmtime_mocked.return_value = expected_last_modification_date
+    def test_should_return_last_modification_date(self, directory_handler):
+        directory_handler.path.getmtime.return_value = 1510431915.0
 
-        with tempfile.NamedTemporaryFile() as file:
-            backup_file = DirectoryEntry(file.name)
-            last_modified_date = backup_file.last_modification_date
+        backup_file = DirectoryEntry('/file1', directory_handler)
 
         assert_that(
-            expected_last_modification_date, equal_to(last_modified_date)
+            backup_file.last_modification_date,
+            equal_to(1510431915.0)
         )
 
     def test_should_raise_inaccessible_file_exception_when_file_not_exist(
-            self
+            self, directory_handler
     ):
+        directory_handler.path.getmtime.side_effect = FileNotFoundError(
+            "[Errno 2] No such file or directory: 'non-existent-file.txt'"
+        )
+
         with pytest.raises(InaccessibleFileException) as excinfo:
-            __ = DirectoryEntry(  # NOQA
-                'non-existent-file.txt'
+            _ = DirectoryEntry(  # NOQA
+                'non-existent-file.txt',
+                directory_handler
             ).last_modification_date
 
         assert_that(
