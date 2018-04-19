@@ -2,7 +2,7 @@ from unittest.mock import Mock
 
 import boto3
 
-from back_me_up.s3_gateway import S3Gateway
+from back_me_up.s3_gateway.s3_gateway import S3Gateway
 
 
 class TestS3Client:
