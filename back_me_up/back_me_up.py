@@ -1,5 +1,5 @@
 import os
-from back_me_up.exceptions import InaccessibleFileException
+from .exceptions import InaccessibleFileException
 
 
 class Directory:
@@ -28,10 +28,3 @@ class DirectoryEntry:
 
 class BackmeUp:
     pass
-
-import subprocess
-
-if __name__ == '__main__':
-    process = subprocess.Popen(["mkdir", "test"])
-    print(process.pid)
-    print(process.terminate())

@@ -1,4 +1,4 @@
-from back_me_up.back_me_up import (
+from .back_me_up import (
     DirectoryEntry, BackmeUp, Directory
 )
 
@@ -6,5 +6,5 @@ from back_me_up.back_me_up import (
 __all__ = [
     'BackmeUp',
     'Directory',
-    'DirectoryEntry'
+    'DirectoryEntry',
 ]
