@@ -2,6 +2,9 @@
 
 Automatically backup folders to different cloud services (S3, Google Drive, Dropbox). It keeps monitoring the files on the folders defined when configured, and when it detects a change on the folder, it automatically update the files on all the services.
 
+# [NOTE]
+
+This readme was written previous the development of the application, so it does not reflect the current status. It was created to guide the development.
 
 ## Installation
 **Back me** up is distributed on [PyPI](https://pypi.python.org). The best way to install it is with pip:
