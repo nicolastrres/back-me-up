@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# vim: ft=sh:
+
+use "app"
+
+SUBCOMMAND_DESC="\t\tApp commands"
+SUBCOMMAND_HELP=$(cat <<EOH
+e|execute       Execute back me up application inside a docker container
+EOH
+)
+
+case ${1} in
+  e|execute)
+    execute ${@:2}
+  ;;
+
+  *)
+    if [ ! -z ${1} ]
+    then
+      in_red "'${1}' not found"
+      _help
+    fi
+esac

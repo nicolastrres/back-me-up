@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+use "docker"
+use "go_to"
+
+function execute() {
+  go_to_root
+  run_container_with_volume python3 -m back_me_up $@
+}
