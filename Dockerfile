@@ -9,6 +9,7 @@ WORKDIR $APP_HOME
 
 COPY requirements.txt           $APP_HOME
 
+RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 COPY back_me_up                 $APP_HOME/back_me_up
