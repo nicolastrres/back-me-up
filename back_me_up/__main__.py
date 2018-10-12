@@ -10,4 +10,5 @@ if __name__ == '__main__':
     parser.add_argument('path')
     args = parser.parse_args()
 
-    s3_gateway.upload(file_path=args.path, bucket_name='backmeup-bucket ')
+    # TODO: this obviously should be changed, needed to parametrize the bucket name
+    s3_gateway.upload(file_path=args.path, bucket_name='backmeup-bucket')
