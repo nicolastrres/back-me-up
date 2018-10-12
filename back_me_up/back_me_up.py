@@ -18,12 +18,13 @@ class DirectoryEntry:
         self.path = path
         self.directory_handler = directory_handler
 
-    @property
-    def last_modification_date(self):
-        try:
-            return self.directory_handler.path.getmtime(self.path)
-        except FileNotFoundError as e:
-            raise InaccessibleFileException(self.path, e)
+
+def md5(fname):
+    hash_md5 = hashlib.md5()
+    with open(fname, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()
 
 
 class BackmeUp:
