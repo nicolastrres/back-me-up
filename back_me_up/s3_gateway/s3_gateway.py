@@ -1,4 +1,5 @@
 import boto3
+from .errors import UploadFileError
 
 
 class S3Gateway:
@@ -6,7 +7,10 @@ class S3Gateway:
         self.client = client
 
     def upload(self, bucket_name, file_path):
-        self.client.upload_file(file_path, bucket_name, file_path)
+        try:
+            self.client.upload_file(file_path, bucket_name, file_path)
+        except Exception as error:
+            raise UploadFileError(error.args)
 
 
 def create():
