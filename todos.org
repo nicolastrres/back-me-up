@@ -1,0 +1,14 @@
+TODOS backmeup
+
+* TODO Encrypt files on client-side
+* TODO Configure a CI
+* TODO Upload a folder
+
+* TODO Offer a link to download the uploaded file
+* TODO Cli built-in functionality to "scaffold" the configuration:
+  - Are you goint to encrypt files in server side or client side?
+  - Would you like to version files?
+  - Would you like to receive a message everytime a file is updated?
+  - etc
+* TODO Worker to keep verifying changes on files and re-uploading
+* TODO Catch when user is not logged into AWSCLI
