@@ -7,8 +7,9 @@ if __name__ == '__main__':
     s3_gateway = create_s3_gateway()
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('path')
+    parser.add_argument('bucket_name', help='Bucket name where the file is going to be stored in S3')
+    parser.add_argument('path', help='Path to file should be uploaded to S3')
+
     args = parser.parse_args()
 
-    # TODO: this obviously should be changed, needed to parametrize the bucket name
-    s3_gateway.upload(file_path=args.path, bucket_name='backmeup-bucket')
+    s3_gateway.upload(file_path=args.path, bucket_name=args.bucket_name)
