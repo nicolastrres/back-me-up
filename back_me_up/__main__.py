@@ -12,4 +12,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    s3_gateway.upload(file_path=args.path, bucket_name=args.bucket_name)
+    try:
+        s3_gateway.upload(file_path=args.path, bucket_name=args.bucket_name)
+    except Exception as e:
+        print(f'The following error was raised while trying to upload \'{args.path}\' to \'{args.bucket_name}\': \n\n\"{e}\"')
