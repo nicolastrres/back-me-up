@@ -1,10 +1,10 @@
 import argparse
+from back_me_up import create as create_back_me_up
 
-from .s3_gateway import create as create_s3_gateway
 
 
 if __name__ == '__main__':
-    s3_gateway = create_s3_gateway()
+    back_me_up = create_back_me_up()
 
     parser = argparse.ArgumentParser()
     parser.add_argument('bucket_name', help='Bucket name where the file is going to be stored in S3')
@@ -13,6 +13,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     try:
-        s3_gateway.upload(file_path=args.path, bucket_name=args.bucket_name)
+        back_me_up.sync(args.bucket_name, args.path)
+        print(f'The file \'{args.path}\' was uploaded successfully to \'{args.bucket_name}\'')
     except Exception as e:
         print(f'The following error was raised while trying to upload \'{args.path}\' to \'{args.bucket_name}\': \n\n\"{e}\"')

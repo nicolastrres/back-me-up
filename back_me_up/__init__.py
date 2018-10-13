@@ -1,9 +1,6 @@
-from .back_me_up import (
-    BackmeUp, Directory
-)
+from .back_me_up import create
 
 
 __all__ = [
-    'BackmeUp',
-    'Directory',
+    'create'
 ]

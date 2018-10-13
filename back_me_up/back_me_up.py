@@ -1,6 +1,6 @@
 import os
 from .exceptions import InaccessibleFileException
-
+from .s3_gateway import create as create_s3_gateway
 
 class Directory:
     def __init__(self, path, directory_handler=os):
@@ -19,13 +19,14 @@ class DirectoryEntry:
         self.directory_handler = directory_handler
 
 
-def md5(fname):
-    hash_md5 = hashlib.md5()
-    with open(fname, "rb") as f:
-        for chunk in iter(lambda: f.read(4096), b""):
-            hash_md5.update(chunk)
-    return hash_md5.hexdigest()
-
-
 class BackmeUp:
-    pass
+    def __init__(self, remote_storage_gateway):
+        self.remote_storage_gateway = remote_storage_gateway
+
+    def sync(self, remote_folder, local_path):
+        self.remote_storage_gateway.upload(remote_folder, local_path)
+
+
+def create():
+    s3_gateway = create_s3_gateway()
+    return BackmeUp(s3_gateway)
