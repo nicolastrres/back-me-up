@@ -1,6 +1,10 @@
 import argparse
+import logging
 from back_me_up import create as create_back_me_up
 
+logging.basicConfig(format='%(message)s')
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 if __name__ == '__main__':
@@ -13,7 +17,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     try:
+        logger.info('Starting to upload file(s)')
         back_me_up.sync(args.bucket_name, args.path)
-        print(f'The file \'{args.path}\' was uploaded successfully to \'{args.bucket_name}\'')
+        logger.info(f'\'{args.path}\' was uploaded successfully to \'{args.bucket_name}\'')
     except Exception as e:
-        print(f'The following error was raised while trying to upload \'{args.path}\' to \'{args.bucket_name}\': \n\n\"{e}\"')
+        logger.error(f'The following error was raised while trying to upload \'{args.path}\' to \'{args.bucket_name}\': \n\n\"{e}\"')
