@@ -1,5 +1,5 @@
 import os
-from unittest.mock import Mock
+from unittest.mock import Mock, call
 
 import pytest
 from hamcrest import assert_that, equal_to, has_length
@@ -28,16 +28,27 @@ class TestDirectory:
         directory = Directory('/', directory_handler)
 
         assert_that(directory.entries, has_length(2))
-        assert_that(directory.entries[0].path, equal_to('file1'))
-        assert_that(directory.entries[1].path, equal_to('file2'))
+        assert_that(directory.entries[0].path, equal_to('//file1'))
+        assert_that(directory.entries[1].path, equal_to('//file2'))
 
 
 class TestBackmeUp:
-    def test_should_upload_file_to_bucket(self):
+    def test_should_upload_file_to_bucket(self, directory_handler):
+        directory_handler.path.isdir.return_value = False
         s3_gateway = Mock(spec=S3Gateway)
 
-        back_me_up = BackmeUp(s3_gateway)
-
+        back_me_up = BackmeUp(directory_handler, s3_gateway)
         back_me_up.sync('my bucket', 'some file')
 
         s3_gateway.upload.assert_called_once_with('my bucket', 'some file')
+
+    def test_should_upload_folder_to_bucket(self, directory_handler):
+        directory_handler.path.isdir.return_value = True
+        directory_handler.listdir.return_value = ['file1', 'file2']
+        s3_gateway = Mock(spec=S3Gateway)
+
+        back_me_up = BackmeUp(directory_handler, s3_gateway)
+        back_me_up.sync('my bucket', 'some folder')
+
+        expected_calls = [call('my bucket', 'some folder/file1'), call('my bucket', 'some folder/file2')]
+        s3_gateway.upload.assert_has_calls(expected_calls)
