@@ -10,9 +10,18 @@ class Directory:
 
     @property
     def entries(self):
-        entries = self.directory_handler.listdir(self.path)
-        return [Entry(f'{self.path}/{entry}') for entry in entries]
+        paths = self.directory_handler.listdir(self.path)
+        entries = [Entry(f'{self.path}/{path}') for path in paths]
 
+        for entry in entries:
+            if self.directory_handler.path.isdir(entry.path):
+                entries.extend(Directory(entry.path, self.directory_handler).entries)
+                entries = self._get_entries_without_path(entries, entry.path)
+
+        return entries
+
+    def _get_entries_without_path(self, entries, path):
+        return list(filter(lambda x: x.path != path, entries))
 
 class Entry:
     def __init__(self, path, directory_handler=os):
@@ -30,7 +39,9 @@ class BackmeUp:
 
     def sync(self, remote_folder, local_path):
         entries = self._get_entries(local_path)
+
         for entry in entries:
+
             self.remote_storage_gateway.upload(remote_folder, entry.path)
 
     def _get_entries(self, path):
