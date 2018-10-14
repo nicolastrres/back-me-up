@@ -7,6 +7,7 @@ from hamcrest import assert_that, equal_to, has_length
 from back_me_up.back_me_up import Directory, BackmeUp
 from back_me_up.s3_gateway.s3_gateway import S3Gateway
 
+
 @pytest.fixture
 def directory_handler():
     return Mock(spec=os)
@@ -46,7 +47,6 @@ class TestDirectory:
         assert_that(directory.entries[4].path, equal_to('dir/subdir/file5'))
 
 
-
 class TestBackmeUp:
     def test_should_upload_file_to_bucket(self, directory_handler):
         directory_handler.path.isdir.return_value = False
@@ -65,7 +65,13 @@ class TestBackmeUp:
         back_me_up = BackmeUp(directory_handler, s3_gateway)
         back_me_up.sync('my bucket', 'dir')
 
-        expected_calls = [call('my bucket', 'dir/file1'), call('my bucket', 'dir/file2'), call('my bucket', 'dir/subdir/file3'), call('my bucket', 'dir/subdir/file4'), call('my bucket', 'dir/subdir/file5')]
+        expected_calls = [
+            call('my bucket', 'dir/file1'),
+            call('my bucket', 'dir/file2'),
+            call('my bucket', 'dir/subdir/file3'),
+            call('my bucket', 'dir/subdir/file4'),
+            call('my bucket', 'dir/subdir/file5')
+        ]
         s3_gateway.upload.assert_has_calls(expected_calls)
 
 
@@ -73,6 +79,7 @@ def is_dir_side_effect(*args, **kwargs):
     if args[0] == 'dir' or args[0] == 'dir/subdir':
         return True
     return False
+
 
 def list_dir_side_effect(*args, **kwargs):
     if args[0] == 'dir':

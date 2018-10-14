@@ -2,7 +2,7 @@ import boto3
 import pytest
 
 from unittest.mock import Mock
-from hamcrest import assert_that, equal_to, has_length
+from hamcrest import assert_that, equal_to
 
 
 from back_me_up.s3_gateway.s3_gateway import S3Gateway
@@ -20,7 +20,6 @@ class TestS3Client:
         s3_client.upload_file.assert_called_once_with(
             'some_file.txt', 'MyBucket', 'some_file.txt'
         )
-
 
     def test_raise_error_when_exception(self):
         s3_client = Mock(spec=boto3.client('s3'))
