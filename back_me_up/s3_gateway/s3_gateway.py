@@ -1,5 +1,5 @@
 import boto3
-from .errors import UploadFileError
+from .errors import UploadFileError, GetMetadataError
 
 
 class S3Gateway:
@@ -12,6 +12,15 @@ class S3Gateway:
             self.client.upload_file(file_path, bucket_name, file_path, ExtraArgs={'Metadata': metadata})
         except Exception as error:
             raise UploadFileError(error.args)
+
+    def get_md5_metadata(self, bucket_name, file_path):
+        try:
+            return self.client.head_object(
+                Bucket=bucket_name,
+                Key=file_path
+            )['ResponseMetadata']['HTTPHeaders']['x-amz-meta-md5']
+        except Exception as error:
+            raise GetMetadataError(error.args)
 
 
 def create():
