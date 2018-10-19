@@ -1,4 +1,5 @@
 import os
+import hashlib
 import logging
 from .s3_gateway import create as create_s3_gateway
 
@@ -45,8 +46,10 @@ class BackmeUp:
     def sync(self, remote_folder, local_path):
         entries = self._get_entries(local_path)
         for entry in entries:
+            hash = calculate_md5(local_path)
             self.logger.info(f'Uploading {entry.path}')
-            self.remote_storage_gateway.upload(remote_folder, entry.path)
+            self.logger.info(f'Hash md5: ${hash}')
+            self.remote_storage_gateway.upload(remote_folder, entry.path, metadata={'md5': hash})
 
     def _get_entries(self, path):
         if self.directory_handler.path.isdir(path):
@@ -59,3 +62,12 @@ class BackmeUp:
 def create():
     s3_gateway = create_s3_gateway()
     return BackmeUp(os, s3_gateway)
+
+
+
+def calculate_md5(path):
+    hash = ''
+    with open(path, 'rb') as file:
+        hash = hashlib.md5(file.read()).hexdigest()
+
+    return hash

@@ -18,7 +18,7 @@ class TestS3Client:
         s3_gateway.upload('MyBucket', 'some_file.txt')
 
         s3_client.upload_file.assert_called_once_with(
-            'some_file.txt', 'MyBucket', 'some_file.txt'
+            'some_file.txt', 'MyBucket', 'some_file.txt', ExtraArgs={'Metadata': {}}
         )
 
     def test_raise_error_when_exception(self):
@@ -30,3 +30,13 @@ class TestS3Client:
             s3_gateway.upload('MyBucket', 'some_file.txt')
 
         assert_that(error_raised.value.args, equal_to(('Some Error Message',)))
+
+    def test_upload_file_should_pass_metadata(self):
+        s3_client = Mock(spec=boto3.client('s3'))
+        s3_gateway = S3Gateway(client=s3_client)
+
+        s3_gateway.upload('MyBucket', 'some_file.txt', metadata={'some_arg': 'some-value'})
+
+        s3_client.upload_file.assert_called_once_with(
+            'some_file.txt', 'MyBucket', 'some_file.txt', ExtraArgs={'Metadata': {'some_arg': 'some-value'}}
+        )
