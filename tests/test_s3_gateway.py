@@ -3,7 +3,7 @@ import botocore
 import pytest
 
 from unittest.mock import Mock
-from hamcrest import assert_that, equal_to
+from hamcrest import assert_that, equal_to, none
 
 
 from back_me_up.s3_gateway.s3_gateway import S3Gateway
@@ -69,3 +69,24 @@ class TestS3Client:
             equal_to(('An error occurred (ExpiredToken) when calling the '
                       'HeadObject operation: Some Error Happened.',))
         )
+
+    def test_get_md5_metadata_should_return_none_if_file_does_not_exist(self):
+        s3_client = Mock(spec=boto3.client('s3'))
+        s3_client.head_object.side_effect = botocore.exceptions.ClientError({
+            'Error': {'Code': '404', 'Message': 'Not Found'},
+            'ResponseMetadata': {'HTTPStatusCode': 404, 'HTTPHeaders': {}}}, 'HeadObject'
+        )
+
+        s3_gateway = S3Gateway(client=s3_client)
+        hash = s3_gateway.get_md5_metadata('MyBucket', 'some_file.txt')
+
+        assert_that(hash, none())
+
+    def test_get_md5_metadata_should_return_none_if_md5_metadata_does_not_exist(self):
+        s3_client = Mock(spec=boto3.client('s3'))
+        s3_client.head_object.return_value = {'ResponseMetadata': {'HTTPHeaders': {}}}
+
+        s3_gateway = S3Gateway(client=s3_client)
+        hash = s3_gateway.get_md5_metadata('MyBucket', 'some_file.txt')
+
+        assert_that(hash, none())

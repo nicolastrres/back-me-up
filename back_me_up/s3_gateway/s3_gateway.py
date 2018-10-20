@@ -19,7 +19,11 @@ class S3Gateway:
                 Bucket=bucket_name,
                 Key=file_path
             )['ResponseMetadata']['HTTPHeaders']['x-amz-meta-md5']
+        except KeyError:
+            return None
         except Exception as error:
+            if error.response['Error']['Code'] == '404':
+                return None
             raise GetMetadataError(error.args)
 
 
