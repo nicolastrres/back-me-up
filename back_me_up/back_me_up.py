@@ -46,23 +46,31 @@ class BackmeUp:
     def sync(self, remote_folder, local_path):
         entries = self._get_entries(local_path)
         for entry in entries:
-            hash = calculate_md5(local_path)
-            self.logger.info(f'Uploading {entry.path}')
-            self.logger.info(f'Hash md5: ${hash}')
-            self.remote_storage_gateway.upload(remote_folder, entry.path, metadata={'md5': hash})
+            local_hash = calculate_md5(entry.path)
+            remote_hash = self._get_remote_md5_hash(remote_folder, entry.path)
+            if remote_hash != local_hash:
+                self._upload_file(remote_folder, entry, local_hash)
+            else:
+                self.logger.info(f'File {entry.path} not changed since last update. Not re-uploading file. \n')
+
+    def _get_remote_md5_hash(self, remote_folder, path):
+        self.logger.debug(f'Getting md5 hash metadata from {remote_folder} for file {path}')
+        return self.remote_storage_gateway.get_md5_metadata(remote_folder, path)
+
+    def _upload_file(self, remote_folder, entry, hash):
+        self.logger.info(f'Uploading {entry.path}')
+        self.logger.info(f'Hash md5: ${hash} \n')
+        self.remote_storage_gateway.upload(remote_folder, entry.path, metadata={'md5': hash})
 
     def _get_entries(self, path):
         if self.directory_handler.path.isdir(path):
-
             return Directory(path, self.directory_handler).entries
-
         return [Entry(path, self.directory_handler)]
 
 
 def create():
     s3_gateway = create_s3_gateway()
     return BackmeUp(os, s3_gateway)
-
 
 
 def calculate_md5(path):

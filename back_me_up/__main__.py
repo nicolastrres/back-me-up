@@ -19,9 +19,8 @@ if __name__ == '__main__':
     try:
         logger.info('Starting to upload file(s)')
         back_me_up.sync(args.bucket_name, args.path)
-        logger.info(f'\'{args.path}\' was uploaded successfully to \'{args.bucket_name}\'')
     except Exception as e:
         logger.error(
-            f'The following error was raised while trying to upload'
+            f'The following error was raised while trying to upload '
             f'\'{args.path}\' to \'{args.bucket_name}\': \n\n\"{e}\"'
         )

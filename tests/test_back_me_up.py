@@ -65,6 +65,18 @@ class TestBackmeUp:
         )
 
     @patch('back_me_up.back_me_up.calculate_md5')
+    def test_should_not_upload_file_if_not_changed(self, calculate_md5_mocked, directory_handler):
+        directory_handler.path.isdir.return_value = False
+        s3_gateway = Mock(spec=S3Gateway)
+        calculate_md5_mocked.return_value = 'some md5 hash'
+        s3_gateway.get_md5_metadata.return_value = 'some md5 hash'
+
+        back_me_up = BackmeUp(directory_handler, s3_gateway)
+        back_me_up.sync('my bucket', 'some file')
+
+        s3_gateway.upload.assert_not_called()
+
+    @patch('back_me_up.back_me_up.calculate_md5')
     def test_should_upload_directory_with_subdirectories_to_bucket(self, calculate_md5_mocked, directory_handler):
         calculate_md5_mocked.return_value = 'some md5 hash'
         directory_handler.path.isdir.side_effect = is_dir_side_effect
