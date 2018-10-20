@@ -1,10 +1,8 @@
 import argparse
-import logging
 from back_me_up import create as create_back_me_up
+from .logs import get_logger
 
-logging.basicConfig(format='%(message)s')
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logger = get_logger(__name__)
 
 
 if __name__ == '__main__':

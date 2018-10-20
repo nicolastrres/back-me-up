@@ -1,6 +1,6 @@
 import os
 import hashlib
-import logging
+from .logs import get_logger
 from .s3_gateway import create as create_s3_gateway
 
 
@@ -40,11 +40,11 @@ class BackmeUp:
     def __init__(self, directory_handler, remote_storage_gateway):
         self.directory_handler = directory_handler
         self.remote_storage_gateway = remote_storage_gateway
-        self.logger = logging.getLogger('back_me_up.back_me_up.BackmeUp')
-        self.logger.setLevel(logging.INFO)
+        self.logger = get_logger('back_me_up.back_me_up.BackmeUp')
 
     def sync(self, remote_folder, local_path):
         entries = self._get_entries(local_path)
+
         for entry in entries:
             local_hash = calculate_md5(entry.path)
             remote_hash = self._get_remote_md5_hash(remote_folder, entry.path)
