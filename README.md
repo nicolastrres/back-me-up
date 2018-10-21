@@ -1,4 +1,4 @@
-# Back me up
+# Back me up [![CircleCI](https://circleci.com/gh/nicolastrres/back-me-up.svg?style=svg)](https://circleci.com/gh/nicolastrres/back-me-up)
 
 Automatically backup folders to different cloud services (S3, Google Drive, Dropbox). It keeps monitoring the files on the folders defined when configured, and when it detects a change on the folder, it automatically update the files on all the services.
 
@@ -47,7 +47,3 @@ backmeup --start -t 5 -f ~/Documents ~/Images
 
 Backmeup reads the credentials for the cloud services from the environment variables.
 ##### TODO: Add more details on the required credentials.
-
-
-
-
