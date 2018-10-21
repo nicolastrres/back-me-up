@@ -1,7 +1,7 @@
 TODOS backmeup
 
 * TODO Encrypt files on client-side
-* TODO Configure a CI
+* DONE Configure a CI
 * DONE Do not upload file if was not changed since last upload
 * DONE Upload a folder
 * TODO Offer a link to download the uploaded file
