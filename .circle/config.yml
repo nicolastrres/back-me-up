@@ -12,23 +12,23 @@ jobs:
           command: |
             ci/build.sh
 
-    static-analysis:
-      docker:
-        - image: nicolastrres/backmeup:${CIRCLE_SHA1}
-      working_directory: /backmeup
-      steps:
-        - run:
-            command: |
-              ci/static_analysis.sh
+  static-analysis:
+    docker:
+      - image: nicolastrres/backmeup:${CIRCLE_SHA1}
+    working_directory: /backmeup
+    steps:
+      - run:
+          command: |
+            ci/static_analysis.sh
 
-    tests:
-      docker:
-        - image: nicolastrres/backmeup:${CIRCLE_SHA1}
-      working_directory: /backmeup
-      steps:
-        - run:
-            command: |
-              ci/tests.sh
+  tests:
+    docker:
+      - image: nicolastrres/backmeup:${CIRCLE_SHA1}
+    working_directory: /backmeup
+    steps:
+      - run:
+          command: |
+            ci/tests.sh
 
 workflows:
   version: 2
