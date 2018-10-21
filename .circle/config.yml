@@ -1,0 +1,31 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: docker:stable
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build and publish docker image
+          command: |
+            ci/build.sh
+
+    static-analysis:
+      docker:
+        - image: nicolastrres/backmeup:${CIRCLE_SHA1}
+      working_directory: /backmeup
+      steps:
+        - run:
+            command: |
+              ci/static_analysis.sh
+
+    tests:
+      docker:
+        - image: nicolastrres/backmeup:${CIRCLE_SHA1}
+      working_directory: /backmeup
+      steps:
+        - run:
+            command: |
+              ci/tests.sh

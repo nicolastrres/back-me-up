@@ -2,7 +2,7 @@ FROM python:3.6.3-alpine3.6
 MAINTAINER Nicolas Agustin Torres <nicolastrres@gmail.com>
 
 
-ENV APP_HOME /back-me-up/
+ENV APP_HOME /backmeup/
 
 RUN mkdir $APP_HOME
 WORKDIR $APP_HOME
