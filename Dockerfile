@@ -12,6 +12,7 @@ COPY requirements.txt           $APP_HOME
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
+COPY .flake8                    $APP_HOME/
 COPY ci                         $APP_HOME/ci/
 COPY back_me_up                 $APP_HOME/back_me_up
 COPY tests                      $APP_HOME/tests
