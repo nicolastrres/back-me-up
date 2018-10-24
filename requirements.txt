@@ -1,6 +1,7 @@
-pytest==3.2.3
+pytest==3.9.2
 PyHamcrest==1.9.0
 flake8==3.5.0
 ipython==6.2.1
 boto3==1.7.4
 colorlog==3.1.4
+pretty-bad-protocol==3.1.1
