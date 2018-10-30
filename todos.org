@@ -1,6 +1,6 @@
 TODOS backmeup
 
-* TODO Encrypt files on client-side
+* DONE Encrypt files on client-side
 * DONE Configure a CI
 * DONE Do not upload file if was not changed since last upload
 * DONE Upload a folder
@@ -12,3 +12,4 @@ TODOS backmeup
   - etc
 * TODO Worker to keep verifying changes on files and re-uploading
 * TODO Catch when user is not logged into AWSCLI
+* DOING Fix dockerfile to make gpg work inside docker
