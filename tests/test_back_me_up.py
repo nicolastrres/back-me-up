@@ -4,14 +4,19 @@ import pytest
 
 from unittest.mock import Mock, call, patch
 from hamcrest import assert_that, equal_to, has_length
-
 from back_me_up.back_me_up import Directory, BackmeUp, calculate_md5
 from back_me_up.s3_gateway.s3_gateway import S3Gateway
+from back_me_up.gpg import GPG
 
 
 @pytest.fixture
 def directory_handler():
     return Mock(spec=os)
+
+
+@pytest.fixture
+def gpg_wrapper():
+    return Mock(spec=GPG)
 
 
 class TestDirectory:
@@ -50,12 +55,12 @@ class TestDirectory:
 
 class TestBackmeUp:
     @patch('back_me_up.back_me_up.calculate_md5')
-    def test_should_upload_file_to_bucket(self, calculate_md5_mocked, directory_handler):
+    def test_should_upload_file_to_bucket(self, calculate_md5_mocked, directory_handler, gpg_wrapper):
         calculate_md5_mocked.return_value = 'some md5 hash'
         directory_handler.path.isdir.return_value = False
         s3_gateway = Mock(spec=S3Gateway)
 
-        back_me_up = BackmeUp(directory_handler, s3_gateway)
+        back_me_up = BackmeUp(directory_handler, s3_gateway, gpg_wrapper)
         back_me_up.sync('my bucket', 'some file')
 
         s3_gateway.upload.assert_called_once_with(
@@ -65,25 +70,27 @@ class TestBackmeUp:
         )
 
     @patch('back_me_up.back_me_up.calculate_md5')
-    def test_should_not_upload_file_if_not_changed(self, calculate_md5_mocked, directory_handler):
+    def test_should_not_upload_file_if_not_changed(self, calculate_md5_mocked, directory_handler, gpg_wrapper):
         directory_handler.path.isdir.return_value = False
         s3_gateway = Mock(spec=S3Gateway)
         calculate_md5_mocked.return_value = 'some md5 hash'
         s3_gateway.get_md5_metadata.return_value = 'some md5 hash'
 
-        back_me_up = BackmeUp(directory_handler, s3_gateway)
+        back_me_up = BackmeUp(directory_handler, s3_gateway, gpg_wrapper)
         back_me_up.sync('my bucket', 'some file')
 
         s3_gateway.upload.assert_not_called()
 
     @patch('back_me_up.back_me_up.calculate_md5')
-    def test_should_upload_directory_with_subdirectories_to_bucket(self, calculate_md5_mocked, directory_handler):
+    def test_should_upload_directory_with_subdirectories_to_bucket(
+            self, calculate_md5_mocked, directory_handler, gpg_wrapper
+    ):
         calculate_md5_mocked.return_value = 'some md5 hash'
         directory_handler.path.isdir.side_effect = is_dir_side_effect
         directory_handler.listdir.side_effect = list_dir_side_effect
         s3_gateway = Mock(spec=S3Gateway)
 
-        back_me_up = BackmeUp(directory_handler, s3_gateway)
+        back_me_up = BackmeUp(directory_handler, s3_gateway, gpg_wrapper)
         back_me_up.sync('my bucket', 'dir')
 
         expected_calls = [
@@ -94,6 +101,38 @@ class TestBackmeUp:
             call('my bucket', 'dir/subdir/file5', metadata={'md5': 'some md5 hash'})
         ]
         s3_gateway.upload.assert_has_calls(expected_calls)
+
+    @patch('back_me_up.back_me_up.calculate_md5')
+    def test_should_upload_encrypted_file_to_bucket(self, calculate_md5_mocked, directory_handler, gpg_wrapper):
+        calculate_md5_mocked.return_value = 'some md5 hash'
+        directory_handler.path.isdir.return_value = False
+        gpg_wrapper.encrypt_file.return_value = 'some encrypted file'
+        s3_gateway = Mock(spec=S3Gateway)
+
+        back_me_up = BackmeUp(directory_handler, s3_gateway, gpg_wrapper)
+        back_me_up.sync('my bucket', 'some file', 'someemail@gmail.com')
+
+        gpg_wrapper.encrypt_file.assert_called_once_with('some file', 'someemail@gmail.com')
+        s3_gateway.upload.assert_called_once_with(
+            'my bucket',
+            'some file.gpg',
+            metadata={'md5': 'some md5 hash'}
+        )
+
+    @patch('back_me_up.back_me_up.calculate_md5')
+    def test_should_get_remote_hash_of_encrypted_file(
+            self, calculate_md5_mocked, directory_handler, gpg_wrapper
+    ):
+        directory_handler.path.isdir.return_value = False
+        calculate_md5_mocked.return_value = 'some md5 hash'
+        gpg_wrapper.encrypt_file.return_value = 'some encrypted file'
+        s3_gateway = Mock(spec=S3Gateway)
+        s3_gateway.get_md5_metadata.return_value = 'some md5 hash'
+
+        back_me_up = BackmeUp(directory_handler, s3_gateway, gpg_wrapper)
+        back_me_up.sync('my bucket', 'some file', 'someemail@gmail.com')
+
+        s3_gateway.get_md5_metadata.assert_called_once_with('my bucket', 'some file.gpg')
 
 
 def test_should_calculate_md5_hash_for_file():

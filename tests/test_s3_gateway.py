@@ -7,7 +7,7 @@ from hamcrest import assert_that, equal_to, none
 
 
 from back_me_up.s3_gateway.s3_gateway import S3Gateway
-from back_me_up.s3_gateway.errors import UploadFileError, GetMetadataError
+from back_me_up.exceptions import UploadFileError, GetMetadataError
 
 
 class TestS3Client:

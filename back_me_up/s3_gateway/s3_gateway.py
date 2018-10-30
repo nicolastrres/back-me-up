@@ -1,5 +1,5 @@
 import boto3
-from .errors import UploadFileError, GetMetadataError
+from back_me_up.exceptions import UploadFileError, GetMetadataError
 
 
 class S3Gateway:
